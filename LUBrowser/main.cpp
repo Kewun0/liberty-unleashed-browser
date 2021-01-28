@@ -243,7 +243,7 @@ int main(int, char**)
                     RegCloseKey(hKey);
                 }
                 if (sizeof(nickname) == 0) { break; }
-                sprintf(szParams, "\"gta3.exe\" -c -h %s -p %s -n %s", ip,port,nickname);
+                sprintf(szParams, "\"gta3.exe\" -h %s -p %s -n %s", ip,port,nickname);
                 char szLibraryPath[1024];
                 sprintf(szLibraryPath, "lu.dll");
                 char szGtaExe[1024];
