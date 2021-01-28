@@ -100,6 +100,8 @@ bool TerminateGTAIfRunning(void)
     return true;
 }
 
+bool isdbg = false;
+
 bool InjectLibraryIntoProcess(HANDLE hProcess, char* szLibraryPath)
 {
     bool bReturn = true;
@@ -221,6 +223,7 @@ int main(int, char**)
             ImGui::InputText("IP", ip, IM_ARRAYSIZE(ip));
             ImGui::PushItemWidth(100);
             ImGui::InputText("Port", port, IM_ARRAYSIZE(port));
+            
 
             if (ImGui::Button("Connect"))
             {
@@ -243,7 +246,11 @@ int main(int, char**)
                     RegCloseKey(hKey);
                 }
                 if (sizeof(nickname) == 0) { break; }
-                sprintf(szParams, "\"gta3.exe\" -h %s -p %s -n %s", ip,port,nickname);
+                if (isdbg) { sprintf(szParams, "\"gta3.exe\" -h %s -p %s -n %s -d", ip, port, nickname); }
+                else
+                {
+                    sprintf(szParams, "\"gta3.exe\" -h %s -p %s -n %s", ip, port, nickname);
+                }
                 char szLibraryPath[1024];
                 sprintf(szLibraryPath, "lu.dll");
                 char szGtaExe[1024];
@@ -269,7 +276,7 @@ int main(int, char**)
                 }
                 ResumeThread(piProcessInfo.hThread);
             }
-           
+            ImGui::SameLine(); ImGui::Checkbox("Console", &isdbg);
             ImGui::End();
         }
 
