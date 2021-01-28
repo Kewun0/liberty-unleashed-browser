@@ -43,7 +43,7 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
 
     // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
+    IMGUI_CHECKVERSION(); 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
