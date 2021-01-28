@@ -37,7 +37,7 @@ bool GetProcessIdFromProcessName(char* szProcessName, DWORD* dwProcessId)
 {
     bool bReturn = false;
 
-    HANDLE hProcessSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    HANDLE hProcessSnapShot = CreateToolhelp32Snapshot(0x00000002, 0);
 
     if (!hProcessSnapShot)
         return false;
@@ -79,7 +79,7 @@ bool TerminateGTAIfRunning(void)
                 if (EnumProcessModules(hProcess, &pModule, sizeof(HMODULE), &cbNeeded))
                 {
                     char szModuleName[500];
-                    if (GetModuleFileNameEx(hProcess, pModule, szModuleName, 500))
+                    if (GetModuleFileNameExA(hProcess, pModule, szModuleName, 500))
                     {
                         if (_strcmpi(szModuleName + strlen(szModuleName) - strlen("gta3.exe"), "gta3.exe") == 0)
                         {
@@ -135,8 +135,84 @@ bool InjectLibraryIntoProcess(HANDLE hProcess, char* szLibraryPath)
     return bReturn;
 }
 char szParams[1024];
-int main(int, char**)
+
+void ImStyl()
 {
+    ImGuiStyle* style = &ImGui::GetStyle();
+    ImVec4* colors = style->Colors;
+
+    colors[ImGuiCol_Text] = ImVec4(0.92f, 0.92f, 0.92f, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.44f, 0.44f, 0.44f, 1.00f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+    colors[ImGuiCol_Border] = ImVec4(0.51f, 0.36f, 0.15f, 1.00f);
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.11f, 0.11f, 0.11f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.51f, 0.36f, 0.15f, 1.00f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.78f, 0.55f, 0.21f, 1.00f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.51f, 0.36f, 0.15f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+    colors[ImGuiCol_MenuBarBg] = ImVec4(0.11f, 0.11f, 0.11f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.53f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.21f, 0.21f, 0.21f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.47f, 0.47f, 0.47f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.81f, 0.83f, 0.81f, 1.00f);
+    colors[ImGuiCol_CheckMark] = ImVec4(0.78f, 0.55f, 0.21f, 1.00f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_Button] = ImVec4(0.51f, 0.36f, 0.15f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.78f, 0.55f, 0.21f, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(0.51f, 0.36f, 0.15f, 1.00f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.93f, 0.65f, 0.14f, 1.00f);
+    colors[ImGuiCol_Separator] = ImVec4(0.21f, 0.21f, 0.21f, 1.00f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.78f, 0.55f, 0.21f, 1.00f);
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.21f, 0.21f, 0.21f, 1.00f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.78f, 0.55f, 0.21f, 1.00f);
+    colors[ImGuiCol_Tab] = ImVec4(0.51f, 0.36f, 0.15f, 1.00f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.91f, 0.64f, 0.13f, 1.00f);
+    colors[ImGuiCol_TabActive] = ImVec4(0.78f, 0.55f, 0.21f, 1.00f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(0.07f, 0.10f, 0.15f, 0.97f);
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.14f, 0.26f, 0.42f, 1.00f);
+    colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+    colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+    colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+    colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+    colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+
+    style->FramePadding = ImVec2(4, 2);
+    style->ItemSpacing = ImVec2(10, 2);
+    style->IndentSpacing = 12;
+    style->ScrollbarSize = 10;
+
+    style->WindowRounding = 4;
+    style->FrameRounding = 4;
+    style->PopupRounding = 4;
+    style->ScrollbarRounding = 6;
+    style->GrabRounding = 4;
+    style->TabRounding = 4;
+
+    style->WindowTitleAlign = ImVec2(1.0f, 0.5f);
+    style->WindowMenuButtonPosition = ImGuiDir_Right;
+
+    style->DisplaySafeAreaPadding = ImVec2(4, 4);
+}
+
+int main(int, char**)
+{ 
+    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
+    remove("imgui.ini");
+
     HKEY hKey = 0;
     char szBuf[256];
 
@@ -171,37 +247,31 @@ int main(int, char**)
 
         RegCloseKey(hKey);
     }
-    
-    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
-    // Setup window
 
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
 
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+    glfwWindowHint(0x00021010, 0);
+    
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(300,300, "Liberty Unleashed 0.1 Server Browser", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(200,100, "Liberty Unleashed 0.1 Server Browser",NULL, NULL);
     
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
 
-    // Setup Dear ImGui context
     IMGUI_CHECKVERSION(); 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    ImGui::StyleColorsClassic();
-
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL2_Init();
-
+    ImStyl();
     bool show_demo_window = true;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-
-    // Main loop
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -209,12 +279,11 @@ int main(int, char**)
         ImGui_ImplOpenGL2_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
         {
             static float f = 0.0f;
             static int counter = 0;
-            ImGui::SetNextWindowPos(ImVec2(0, 0));
-            ImGui::Begin("Hello, world!",NULL,ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoBackground|ImGuiWindowFlags_NoTitleBar);                          // Create a window called "Hello, world!" and append into it.
+            ImGui::SetNextWindowPos(ImVec2(1.0f, 1.0f));
+            ImGui::Begin("LU",NULL,ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoBackground|ImGuiWindowFlags_NoTitleBar);                          // Create a window called "Hello, world!" and append into it.
 
            
             ImGui::PushItemWidth(100);
@@ -280,13 +349,13 @@ int main(int, char**)
             ImGui::End();
         }
 
-        // Rendering
+        
         ImGui::Render();
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(0x000040000);
 
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
