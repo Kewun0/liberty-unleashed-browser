@@ -208,7 +208,53 @@ void ImStyl()
     style->DisplaySafeAreaPadding = ImVec2(4, 4);
 }
 
-int main(int, char**)
+#ifdef _WIN32
+#include <io.h> 
+#define access    _access_s
+#else
+#include <unistd.h>
+#endif
+
+#include <string>
+
+bool FileExists(const std::string& Filename)
+{
+    return access(Filename.c_str(), 0) == 0;
+}
+int dinp = 0;
+int ddra = 0;
+int game_tampered = 0;
+#include <filesystem>
+void listFiles(const char* path)
+{
+    struct _finddata_t dirFile;
+    long hFile;
+
+    if ((hFile = _findfirst(path, &dirFile)) != -1)
+    {
+        do
+        {
+            if (!strcmp(dirFile.name, ".")) continue;
+            if (!strcmp(dirFile.name, "..")) continue;
+            if (1==1)
+            {
+                if (dirFile.attrib & _A_HIDDEN) continue;
+                if (dirFile.name[0] == '.') continue;
+            }
+
+            if (strstr(dirFile.name, ".asi")) 
+            { 
+                game_tampered = 1;
+            }
+          
+
+        } while (_findnext(hFile, &dirFile) == 0);
+        _findclose(hFile);
+    }
+}
+//int main(int, char**)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
+
 { 
     ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
     remove("imgui.ini");
@@ -256,7 +302,7 @@ int main(int, char**)
     
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(200,100, "Liberty Unleashed 0.1 Server Browser",NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(200,100, "Servers",NULL, NULL);
     
     if (window == NULL)
         return 1;
@@ -300,7 +346,7 @@ int main(int, char**)
                 RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\GTA3LU", 0, KEY_WRITE, &hKey);
                 
                 if (!hKey) {
-                    RegCreateKey(HKEY_LOCAL_MACHINE, "Software\\GTA3LU", &hKey);
+                    RegCreateKey(HKEY_LOCAL_MACHINE, "Software\\GTA3LU", &hKey); 
                 }
                 if (hKey) {
                     DWORD dwSize = sizeof(nickname);
@@ -329,6 +375,21 @@ int main(int, char**)
                 memset(&siStartupInfo, 0, sizeof(siStartupInfo));
                 memset(&piProcessInfo, 0, sizeof(piProcessInfo));
                 siStartupInfo.cb = sizeof(siStartupInfo);
+                listFiles("/");
+                if (game_tampered == 1)
+                {
+                    MessageBox(NULL, "mods", "", 0);
+                }
+                if (FileExists("dinput8.dll"))
+                {
+                    dinp = 1;
+                    rename("dinput8.dll", "dinput8.bak");
+                }
+                if (FileExists("ddraw.dll"))
+                {
+                    ddra = 1;
+                    rename("ddraw.dll", "ddraw.bak");
+                }
                 if (!CreateProcess(szGtaExe, szParams, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, NULL, &siStartupInfo,
                     &piProcessInfo)) {
                     MessageBoxA(NULL,"Couldn't launch gta3.exe.\nDid you install Liberty Unleashed to your GTA3 directory?","Error",NULL);
@@ -344,6 +405,8 @@ int main(int, char**)
                     MessageBoxA(NULL, "Failed to inject lu.dll", "Fatal Error", 0);
                 }
                 ResumeThread(piProcessInfo.hThread);
+                if (dinp == 1) { rename("dinput8.bak", "dinput8.dll"); dinp = 0; }
+                if (ddra == 1) { rename("ddraw.bak", "ddraw.dll"); ddra = 0; }
             }
             ImGui::SameLine(); ImGui::Checkbox("Console", &isdbg);
             ImGui::End();
